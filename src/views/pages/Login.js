@@ -1,59 +1,107 @@
 
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState, useContext} from "react";
+import AuthContext from "../../context/AuthProvider";
+import login from "../../services/LoginServices";
+
+
+const LOGIN_URL = '/api/auth/';
+
 
 const Login = () => {
 
-    const [username, setUsername] = useState()
-    const [password, setPassword] = useState()
+    const { setAuth } = useContext(AuthContext)
+    const [error, setError] = useState("")
+    const [username, setUsername] = useState();
+    const [password, setPassword] = useState();
+    const [success, setSuccess] = useState(false);
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
+    const userRef = useRef(null);
+
+    useEffect(() => {
+        userRef.current.focus();
+    }, []);
+
+
+    const redirect = () => {
+        window.location.href = '/register';
     }
 
-    return <div className="flex flex-col justify-center p-20 w-1/2">
-        <div className="">
-            <p className="text-3xl">Bem-vindo de volta!</p>
-            <p className="text-xl">Acesse sua conta</p>
-        </div>
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            const e = await login(username, password);
 
-        <div className="max-w-1/2">
-            <form onSubmit={handleSubmit}>
-                <div className="flex-col w-full max-w-sm min-w-[200px]">
-                    <div className="pb-3">
-                        <label>
-                            Usuário
-                        </label>
-                    </div>
-                    <div className="relative">
-                        <input type="text" id="username" required className="peer w-full bg-transparent placeholder:text-slate-400
-                        text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition-duration-300
-                          ease focus:outline-none focus:border-slate-300 shadow-sm focus:shadow" placeholder="Escreva Aqui..." onChange={(e) => setUsername(e.target.value)}/>
+            if (e.response.status === 401 || e.response.status === 500){
+                setError("Usuário ou senha inválidos");
+            }
+            // setSuccess(true);
+        } catch (e) {
+            console.log("teste: ", e.response.status);
+        }
 
-                    </div>
+
+
+    }
+
+    return(
+    <>
+        {success ? (
+            <section>
+                <h1>
+                    Voce esta logado
+                </h1>
+            </section>
+            ) : (<div className="flex flex-col justify-center p-20 w-1/2 h-dvh">
+            <div className="mb-4">
+                <p className="text-4xl text-emerald-700 ">Bem-vindo de volta!</p>
+                <p className="text-xl text-gray-800 ">Acesse sua conta</p>
+            </div>
+
+            <div className="max-w-1/2">
+                <form onSubmit={handleSubmit}>
                     <div className="flex-col w-full max-w-sm min-w-[200px]">
                         <div className="pb-3">
                             <label>
-                                Senha
+                                Usuário
                             </label>
                         </div>
-                        <div className="relative">
-                            <input type="password" id="password" required className="peer w-full bg-transparent placeholder:text-slate-400
+                        <div className="relative mb-4">
+                            <input type="text" id="username" required className="peer w-full placeholder:text-gray-700 bg-stone-100
                             text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition-duration-300
-                              ease focus:outline-none focus:border-slate-300 shadow-sm focus:shadow" placeholder="Escreva Aqui..." onChange={(e) => setPassword(e.target.value)}/>
-
+                              ease focus:outline-none focus:border-slate-300 shadow-sm focus:shadow" ref={userRef} placeholder="Escreva Aqui..." onChange={(e) => setUsername(e.target.value)}/>
                         </div>
-                    </div>
-                    <div className="flex flex-row items-center" >
-                        <button className="p-3 mr-5 bg-blue-500 rounded-xl w-1/4 text-white shadow hover:bg-blue-700 mt-3">
-                            Login
-                        </button>
+                        <div className="flex-col w-full max-w-sm min-w-[200px]">
+                            <div className="pb-3">
+                                <label>
+                                    Senha
+                                </label>
+                            </div>
+                            <div className="relative mb-4">
+                                <input type="password" id="password" required className="peer w-full placeholder:text-gray-700 bg-stone-100
+                                text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition-duration-300
+                                  ease focus:outline-none focus:border-slate-300 shadow-sm focus:shadow" ref={userRef} placeholder="Escreva Aqui..." onChange={(e) => setPassword(e.target.value)}/>
+                                {error && (
+                                    <div className="flex ">
+                                        <span className="text-red-400 ">{error}</span>
+                                    </div>
+                                )
+                                }
+                            </div>
+                        </div>
+                        <div className="flex flex-row items-center" >
+                            <button className="p-3 mr-5 bg-emerald-600 rounded-xl w-1/4 text-white  hover:bg-emerald-700 shadow-sm hover:shadow  mt-3">
+                                Login
+                            </button>
 
-                        <p className="">Não tem uma conta? <a className="text-blue-500 hover:text-blue-700 cursor-pointer">registrar-se</a></p>
-                    </div>
-                    </div>
-            </form>
+                            <p className="">Não tem uma conta? <a className="text-emerald-600 hover:text-emerald-700 cursor-pointer" onClick={redirect}>registrar-se</a></p>
+                        </div>
+                        </div>
+                </form>
+            </div>
         </div>
-    </div>
+            )}
+    </>
+            )
 };
 
 export default Login;
