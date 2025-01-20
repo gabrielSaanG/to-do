@@ -14,17 +14,8 @@ public class UserImpl implements Users {
     public UserImpl(Datastore datastore) {
         this.datastore = datastore;
 
-
-        List<TesteDTO> testes = datastore.createQuery(TesteDTO.class).asList();
     }
 
-//    public User() throws Exception{
-//        TesteDTO teste = new TesteDTO("159", "Ola");
-//        datastore.save(teste);
-//
-//        List<TesteDTO> testes = datastore.createQuery(TesteDTO.class).asList();
-//
-//    }
 
     @Override
     public void insertUser(UserDTO user) {
