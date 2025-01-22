@@ -7,7 +7,6 @@ async function login(username, password){
     };
 
     try{
-        console.log(loginData);
         const response = await axios.post('http://localhost:8100/api/auth/login', loginData, {
             headers: {
                 'Content-Type': 'application/json',
