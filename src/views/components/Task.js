@@ -1,28 +1,44 @@
 import React from 'react'
-import { FaTrash, FaCirclePlus } from "react-icons/fa6";
+import { FaTrash} from "react-icons/fa6";
 import {FaEdit} from "react-icons/fa";
+import {deleteTasks} from "../../services/TaskServices";
 
-const Task = () => {
+const taskDelete = async (props, event) => {
+    event.preventDefault()
+    try{
+        const e = await deleteTasks(props.id)
+        console.log(e)
+    } catch (e){
+        console.log(e)
+    }
+}
+
+export function Task (props) {
     return (
         <div className="max-w-80 bg-neutral-100 p-6 rounded-2xl shadow m-4 ">
             <div className="text-2xl text-emerald-800 mb-4">
                 <h1>
-                    Titulo da Tarefa
+                    {props.name}
                 </h1>
             </div>
             <div>
                 <p className="text-gray-800 text-justify" >
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus accusantium alias aliquid architecto atque cum delectus,
-                    dolores impedit nihil non quae, qui ratione recusandae sed totam vero voluptatem. Debitis, doloremque!
+                    {props.description}
                 </p>
             </div>
             <div className="flex justify-start mt-4">
                     <FaEdit className="text-2xl mr-10 text-emerald-700 mt-3 cursor-pointer hover:text-emerald-800"/>
-                    <FaTrash className="text-2xl text-emerald-700 mt-3 cursor-pointer hover:text-emerald-800"/>
+                    <FaTrash className="text-2xl text-emerald-700 mt-3 cursor-pointer hover:text-emerald-800" onClick={(e)=> {
+                        taskDelete(props, e)
+                    }}/>
 
             </div>
         </div>
     )
 }
 
-export default Task;
+
+
+
+
+

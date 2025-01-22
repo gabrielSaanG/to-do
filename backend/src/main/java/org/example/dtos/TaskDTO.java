@@ -16,9 +16,14 @@ public class TaskDTO {
 
     }
 
-    public TaskDTO(String title, String description) {
+    public TaskDTO(ObjectId id, String title, String description) {
+        this.id = id;
         this.title = title;
         this.description = description;
+    }
+
+    public ObjectId getId() {
+        return id;
     }
 
     public String getDescription() {

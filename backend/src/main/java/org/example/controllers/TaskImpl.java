@@ -2,6 +2,9 @@ package org.example.controllers;
 
 import org.example.dtos.TaskDTO;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
+
+import java.util.List;
 
 public class TaskImpl implements Tasks {
 
@@ -21,9 +24,16 @@ public class TaskImpl implements Tasks {
         }
     }
 
+
+
     @Override
     public void deleteTask(TaskDTO task) {
-
+        if (task != null){
+            datastore.delete(task);
+            System.out.println("Deleted Task");
+        } else{
+            System.out.println("Task is null");
+        }
     }
 
     @Override
