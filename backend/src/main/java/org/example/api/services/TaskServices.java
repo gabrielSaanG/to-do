@@ -1,10 +1,9 @@
 package org.example.api.services;
 
-import javafx.concurrent.Task;
-import org.bson.types.ObjectId;
 import org.example.controllers.TaskImpl;
 import org.example.dtos.TaskDTO;
 import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -54,20 +53,31 @@ public class TaskServices extends BaseServices {
     }
 
     @POST
-    @Path("/delete")
+    @Path("/get_task")
     @Consumes("application/json; charset=UTF-8")
     @Produces("application/json; charset=UTF-8")
-    public Response deleteTask(Object id) {
-        try{
-            Query<TaskDTO> query = datastore.createQuery(TaskDTO.class).field("id").equal(id);
-            TaskDTO taskToDelete = query.asList().get(0);
-            if (taskToDelete == null){
-                return Response.status(Response.Status.NOT_FOUND).build();
-            }
-            taskImpl.deleteTask(taskToDelete);
-            return Response.status(Response.Status.OK).build();
+    public Response getTask(TaskDTO task) {
+     try{
+           Query<TaskDTO> query = datastore.createQuery(TaskDTO.class).field("token").equal(task.getToken());
+           UpdateOperations<TaskDTO> updateOperations = datastore.createUpdateOperations(TaskDTO.class).set("title", task.getTitle()).set("description", task.getDescription());
+           TaskDTO editedTask = datastore.findAndModify(query, updateOperations);
+           return Response.status(Response.Status.OK).entity(editedTask).build();
         } catch (Exception e){
-            System.out.println(id);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DELETE
+    @Path("/delete")
+    @Consumes("application/json; charset=UTF")
+    public Response deleteTask(TaskDTO task) {
+        try{
+            TaskDTO taskDeleted = datastore.findAndDelete(datastore.createQuery(TaskDTO.class).field("token").equal(task.getToken()));
+            System.out.println(taskDeleted.getTitle());
+            return Response.status(Response.Status.OK).build();
+
+        } catch (Exception e){
+//            System.out.println(task);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }

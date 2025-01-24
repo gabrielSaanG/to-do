@@ -2,15 +2,18 @@ import React, {useState} from "react";
 import {insertTask} from "../../../services/TaskServices";
 import {IoIosCloseCircle} from "react-icons/io";
 import {FaCheck} from "react-icons/fa";
+import {create} from "axios";
 
-export function TaskCreation({isVisible, setIsVisible, createtask}) {
+export function TaskCreation({isVisible, setIsVisible, createtask, taskToBeEdited}) {
 
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
     const [isConfirmed, setIsConfirmed] = useState(false)
 
+
     const handleSubmit = async (event) => {
         event.preventDefault();
+
         try{
             const e = await insertTask(title, description)
             console.log(e)
@@ -26,7 +29,7 @@ export function TaskCreation({isVisible, setIsVisible, createtask}) {
     return (
         <>
             {!isConfirmed ? (
-            <div className="fixed transform -translate-x-1/2 left-1/2 w-96 shadow-lg  flex justify-center items-center rounded-2xl">
+            <div className={`fixed transform -translate-x-1/2 left-1/2 w-96 shadow-lg flex justify-center items-center rounded-2xl`}>
                 <form onSubmit={handleSubmit} className="w-full">
                     <div className="bg-neutral-100 shadow-sm p-5 rounded-2xl w-full">
                         <div className="flex w-full justify-end ">
