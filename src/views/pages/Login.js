@@ -14,11 +14,14 @@ const Login = () => {
     const [username, setUsername] = useState();
     const [password, setPassword] = useState();
     const [success, setSuccess] = useState(false);
+    const [isLoading, setIsLoading] = useState(true)
+
 
     const userRef = useRef(null);
 
     useEffect(() => {
         userRef.current.focus();
+        setIsLoading(false)
     }, []);
 
 
@@ -53,8 +56,8 @@ const Login = () => {
             </section>
             ) : (<div className="flex flex-col justify-center p-20 w-1/2 h-dvh">
             <div className="mb-4">
-                <p className="text-4xl text-emerald-700 ">Bem-vindo de volta!</p>
-                <p className="text-xl text-gray-800 ">Acesse sua conta</p>
+                <p className={`text-4xl text-emerald-700 transition-opacity duration-1000 ${isLoading ? `opacity-0` : `opacity-100`}`}>Bem-vindo de volta!</p>
+                <p className={`text-xl text-gray-800 transition-opacity duration-1000 ${isLoading ? `opacity-0` : `opacity-100`}`}>Acesse sua conta</p>
             </div>
 
             <div className="max-w-1/2">
@@ -89,7 +92,8 @@ const Login = () => {
                             </div>
                         </div>
                         <div className="flex flex-row items-center" >
-                            <button className="p-3 mr-5 bg-emerald-600 rounded-xl w-1/4 text-white  hover:bg-emerald-700 shadow-sm hover:shadow  mt-3">
+                            <button className="p-3 mr-5 bg-emerald-600 rounded-xl w-1/4 text-white  hover:bg-emerald-700 shadow-sm hover:shadow mt-3
+                            hover:-translate-y-0.5 hover:shadow hover:scale-110 transition-all">
                                 Login
                             </button>
 

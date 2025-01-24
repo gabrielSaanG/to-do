@@ -11,6 +11,22 @@ export async function getAllTasks(){
         console.log("Couldn't get array of tasks")
     }
 }
+export async function getTask(taskObject){
+    try{
+        const response = await axios.post('http://localhost:8100/api/tasks/get_task', taskObject, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+
+
+        if (response.status === 200 ){
+            return response
+        }
+    } catch (e) {
+        console.log("creation failed", e.status)
+    }
+}
 
 export async function insertTask(title, description){
     const taskData = {
@@ -32,12 +48,36 @@ export async function insertTask(title, description){
     }
 }
 
-export async function deleteTasks(id){
+export async function editTask(taskDataProvider){
 
     try{
-        console.log(id)
-        const response = await axios.post('http://localhost:8100/api/tasks/delete', id, {
+        const response = await axios.post('http://localhost:8100/api/tasks/get_task', taskDataProvider, {
             'Content-Type': 'application/json'
+        })
+
+        if (response.status === 200){
+            console.log("Edit successful")
+            return response
+        }
+        else console.log("Could not edit task")
+    } catch (e){
+        console.log("EditTask function failed", e)
+    }
+}
+
+export async function deleteTasks(taskObject){
+
+
+    try{
+        const response = await axios.delete('http://localhost:8100/api/tasks/delete', {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            data: {
+                token: taskObject.token,
+                title: taskObject.title,
+                description: taskObject.description,
+            }
         })
 
         if (response.status === 200){
