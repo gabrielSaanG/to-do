@@ -9,6 +9,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 @Path("/tasks")
 public class TaskServices extends BaseServices {
@@ -20,9 +21,13 @@ public class TaskServices extends BaseServices {
     @Consumes("application/json; charset=UTF-8")
     public Response insertTask(TaskDTO task) {
 
-        if (task == null){
-            return Response.status(Response.Status.BAD_REQUEST).build();
+        System.out.println(task.getToken());
+
+        if (task.getToken() == 0){
+            Random rand = new Random();
+            task.setToken(rand.nextInt() * 10);
         }
+
         try{
             taskImpl.insertTask(task);
             return Response.status(Response.Status.CREATED).entity(task).build();
@@ -30,9 +35,6 @@ public class TaskServices extends BaseServices {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-    //ToDo - criar timestamp nas Tasks para realizar pesquisa e buscar id no banco de dados através dela.
-    //ToDo - apos busca retornar objeto Task criado do banco, para que nao seja necessário atualiar pagina.
 
     @GET
     @Path("/get")
@@ -53,13 +55,13 @@ public class TaskServices extends BaseServices {
     }
 
     @POST
-    @Path("/get_task")
+    @Path("/update")
     @Consumes("application/json; charset=UTF-8")
     @Produces("application/json; charset=UTF-8")
     public Response getTask(TaskDTO task) {
      try{
            Query<TaskDTO> query = datastore.createQuery(TaskDTO.class).field("token").equal(task.getToken());
-           UpdateOperations<TaskDTO> updateOperations = datastore.createUpdateOperations(TaskDTO.class).set("title", task.getTitle()).set("description", task.getDescription());
+           UpdateOperations<TaskDTO> updateOperations = datastore.createUpdateOperations(TaskDTO.class).set("title", task.getTitle()).set("description", task.getDescription()).set("completed", task.getCompleted());
            TaskDTO editedTask = datastore.findAndModify(query, updateOperations);
            return Response.status(Response.Status.OK).entity(editedTask).build();
         } catch (Exception e){

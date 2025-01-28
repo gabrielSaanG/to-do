@@ -2,9 +2,8 @@ import React, {useState} from "react";
 import {insertTask} from "../../../services/TaskServices";
 import {IoIosCloseCircle} from "react-icons/io";
 import {FaCheck} from "react-icons/fa";
-import {create} from "axios";
 
-export function TaskCreation({isVisible, setIsVisible, createtask, taskToBeEdited}) {
+export function TaskDialog({isVisible, setIsVisible, frontTaskUpdate, backEndTask, task}) {
 
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
@@ -14,11 +13,19 @@ export function TaskCreation({isVisible, setIsVisible, createtask, taskToBeEdite
     const handleSubmit = async (event) => {
         event.preventDefault();
 
+
+        const taskData ={
+            title: title,
+            description: description,
+            completed: "INCOMPLETE",
+            token: task && task.token
+        }
+
         try{
-            const e = await insertTask(title, description)
+            const e = await backEndTask(taskData)
             console.log(e)
             setIsConfirmed(!isConfirmed)
-            createtask(e.data)
+            frontTaskUpdate(e.data)
         } catch (e){
             console.log(e)
         }
