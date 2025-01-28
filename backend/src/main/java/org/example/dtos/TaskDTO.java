@@ -16,7 +16,7 @@ public class TaskDTO {
     private int token = rand.nextInt() * 10;
     private String title;
     private String description;
-    private String completion = "INCOMPLETE";
+    private String completed;
 
     public TaskDTO(){
 
@@ -28,12 +28,12 @@ public class TaskDTO {
         this.description = description;
     }
 
-    public String getCompletion() {
-        return completion;
+    public String getCompleted() {
+        return completed;
     }
 
-    public void setCompletion(String completion) {
-        this.completion = completion;
+    public void setCompleted(String completion) {
+        this.completed = completion;
     }
 
     public ObjectId getId() {

@@ -28,12 +28,7 @@ export async function getTask(taskObject){
     }
 }
 
-export async function insertTask(title, description){
-    const taskData = {
-        title: title,
-        description: description,
-    }
-
+export async function insertTask(taskData){
     try{
         const response = await axios.post('http://localhost:8100/api/tasks/insert', taskData, {
             'Content-Type': 'application/json'
@@ -48,10 +43,17 @@ export async function insertTask(title, description){
     }
 }
 
-export async function editTask(taskDataProvider){
+export async function editTaskServices(taskDataProvider){
+
+    const taskObject = {
+        title: taskDataProvider.title,
+        description: taskDataProvider.description,
+        token: taskDataProvider.token,
+        completed: taskDataProvider.completed
+    }
 
     try{
-        const response = await axios.post('http://localhost:8100/api/tasks/get_task', taskDataProvider, {
+        const response = await axios.post('http://localhost:8100/api/tasks/update', taskObject, {
             'Content-Type': 'application/json'
         })
 

@@ -1,15 +1,16 @@
 import React, {useEffect, useState} from 'react'
 import {Task} from "../components/Task";
-import {TaskCreation} from "../components/TaskCreation/TaskCreation";
+import {TaskDialog} from "../components/TaskDialog/TaskDialog";
 import { FaCirclePlus } from "react-icons/fa6";
-import {getAllTasks} from "../../services/TaskServices";
-import {TaskEditing} from "../components/TaskEditing/TaskEditing";
-
+import {editTaskServices, getAllTasks, insertTask} from "../../services/TaskServices";
 export function Main(){
 
 
     const [isFetched, setIsFetched] = useState(true)
     const [task, setTask] = useState([])
+    const [completedTask, setCompletedTask] = useState([])
+
+
     const [isVisible, setIsVisible] = useState(false)
     const [visibilityEditingScreen, setVisibilityEditingScreen] = useState(false)
     const [taskToBeEdited, setTaskToBeEdited] = useState(null)
@@ -19,36 +20,47 @@ export function Main(){
     useEffect(() => {
         async function fetchData() {
             const response = await getAllTasks()
+
             if (response === undefined) return null;
-            if (JSON.stringify(response.data) !== JSON.stringify(task)) {
-                setTask(response.data)
+
+
+            const newTasks = response.data.filter(item => {
+                return !task.some(existingTask => existingTask.token === item.token)
+            })
+
+            if (newTasks.length > 0) {
+                newTasks.forEach(item => {
+                    if (item.completed === "COMPLETED")
+                        setCompletedTask(prev => [...prev, item])
+                    else setTask(prev => [...prev, item])
+                })
             }
         }
         setIsLoading(false)
         setIsFetched(false)
         fetchData()
-    }, [task]);
+    }, []);
 
 
     function creationTask(taskDataProvider) {
-        const task = {
-            "id": taskDataProvider.id,
-            "title": taskDataProvider.title,
-            "description": taskDataProvider.description
-        }
-        console.log(task)
-        setTask((prevTasks) => [...prevTasks, task])
+        setTask((prevTasks) => [...prevTasks, taskDataProvider])
         setIsSubmitting(!isSubmitting)
     }
 
     function trashCan(taskDataProvider){
-        const taskToDelete = {
-            "id": taskDataProvider.id,
-            "title": taskDataProvider.title,
-            "description": taskDataProvider.description,
-            "token": taskDataProvider.token
+
+
+        switch(taskDataProvider.completed){
+            case "COMPLETED":
+                setCompletedTask(completedTask.filter((task) => task.token !== taskDataProvider.token))
+                break
+            case "INCOMPLETE":
+                setTask(task.filter((task) => task.token !== taskDataProvider.token))
+                break
+            default:
+                break;
         }
-        setTask(task.filter(task => task === taskToDelete))
+
     }
 
     function editIcon(taskDataProvider){
@@ -78,6 +90,12 @@ export function Main(){
         }))
     }
 
+    function completeIcon(taskDataProvider){
+        setTask(task.filter((task) => task.token !== taskDataProvider.token))
+        setCompletedTask((prevTasks) => [...prevTasks, taskDataProvider])
+        console.log(completedTask)
+    }
+
 
 
     return <div className={`transition-opacity duration-700 ${isLoading ? `opacity-0` : `opacity-100`}`}>
@@ -86,16 +104,34 @@ export function Main(){
                 setIsVisible(!isVisible)
             }}><FaCirclePlus className="text-6xl text-emerald-700 hover:text-emerald-800 cursor-pointer p-2"/></button>
         </div>
-        {visibilityEditingScreen ? <TaskEditing isVisible={visibilityEditingScreen} setIsVisible={setVisibilityEditingScreen} taskToBeEdited={taskToBeEdited} updateTask={updateTask}/> : null}
-        {isVisible ? <TaskCreation isVisible={isVisible} setIsVisible={setIsVisible} createtask={creationTask} taskToBeEdited={taskToBeEdited}/> : null}
+        {visibilityEditingScreen ? <TaskDialog isVisible={visibilityEditingScreen} setIsVisible={setVisibilityEditingScreen} task={taskToBeEdited} backEndTask={editTaskServices} frontTaskUpdate={updateTask}/> : null}
+        {isVisible ? <TaskDialog isVisible={isVisible} setIsVisible={setIsVisible} frontTaskUpdate={creationTask} backEndTask={insertTask} task={taskToBeEdited}/> : null}
         <div className="flex max-w-screen-xl  scroll-auto justify-left">
             {task.map(item => {
-                return(
+                return item && (
                 <div className={`w-80 h-fit break-words min-w-80 transition-opacity duration-1000`}>
-                    <Task name={item.title} description={item.description} id={item.id} token={item.token}
-                          trashCan={trashCan} editIcon={editIcon}/>
+                    <Task task={item} completed={item.completed}
+                          trashCan={trashCan} editIcon={editIcon} completeIcon={completeIcon} isCompleted={completedTask}/>
                 </div>
             )})}
+        </div>
+
+
+        <div>
+            <div className="border-b-2">
+                <h1 className="text-emerald-700 mt-10 ml-4 text-2xl mb-3">Tasks Completadas</h1>
+            </div>
+
+            <div className="flex max-w-screen-xl  scroll-auto justify-left">
+                {completedTask.map(item  => {
+                    return item && (
+                        <div className={`w-80 h-fit break-words min-w-80 transition-opacity duration-1000`}>
+                            <Task task={item} trashCan={trashCan} editIcon={editIcon} completeIcon={completeIcon}/>
+                        </div>
+                    )
+                })}
+            </div>
+
         </div>
     </div>
 }
